@@ -8,11 +8,8 @@ function FormComponent() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); // Log form data for testing
-    
     axios.post('http://127.0.0.1:5000/keywords', formData)
         .then((response) => {
-            console.log(response)
             setResponse(response?.data?.keywords);
         });
   };

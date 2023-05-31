@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography } from '@mui/material';
+import axios from 'axios';
 
 function FormComponent() {
   const [formData, setFormData] = useState({});
+  const [response, setResponse] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); // Log form data for testing
-    // Make API call or handle form submission logic here
+    axios.post('http://127.0.0.1:5000/description', formData)
+        .then((response) => {
+            setResponse(response?.data?.description);
+        });
   };
 
   const handleChange = (e) => {
@@ -17,7 +21,7 @@ function FormComponent() {
   return (
     <div>
       <Typography variant="h4" gutterBottom>
-        Form Component
+        Criar nova descrição
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -36,8 +40,13 @@ function FormComponent() {
           margin="normal"
           onChange={handleChange}
         />
-        <Button type="submit" variant="contained">Submit</Button>
+        <Button type="submit" variant="contained">Criar</Button>
       </form>
+      <Typography variant="h4" gutterBottom>
+            Nova Descrição: 
+            <br></br>
+            {response}
+        </Typography>
     </div>
   );
 }
