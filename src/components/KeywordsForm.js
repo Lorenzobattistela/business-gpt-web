@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography, Card, CircularProgress } from '@mui/material';
 import axios from 'axios';
 
-function FormComponent() {
+function KeywordsForm({authToken}) {
   const [formData, setFormData] = useState({});
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://127.0.0.1:5000/keywords', formData)
-        .then((response) => {
-            setResponse(response?.data?.keywords);
-        });
+    setLoading(true);
+    axios.post('http://127.0.0.1:5000/keywords', formData, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => {
+        setResponse(response?.data?.keywords);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
-
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -40,15 +49,21 @@ function FormComponent() {
           margin="normal"
           onChange={handleChange}
         />
-        <Button type="submit" variant="contained">Buscar</Button>
-        <Typography variant="h4" gutterBottom>
-            Palavras Chave: 
-            <br></br>
-            {response}
-        </Typography>
+        {!loading && (
+          <Button type="submit" variant="contained">
+            Buscar
+          </Button>
+        )}
+        {loading && <CircularProgress />} {/* Display loading tag while waiting */}
       </form>
+      {response && (
+        <Card variant="outlined" style={{ marginTop: '1rem', padding: '1rem' }}>
+          <Typography variant="h6">Palavras chave:</Typography>
+          <Typography>{response}</Typography>
+        </Card>
+      )}
     </div>
   );
 }
 
-export default FormComponent;
+export default KeywordsForm;
