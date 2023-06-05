@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography, Card, CircularProgress } from '@mui/material';
 import axios from 'axios';
 
-function FormComponent() {
+function PostsForm() {
   const [formData, setFormData] = useState({});
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios.post('http://127.0.0.1:5000/post', formData)
-        .then((response) => {
-            setResponse(response?.data?.post);
-        });
+      .then((response) => {
+        setResponse(response?.data?.post);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleChange = (e) => {
@@ -40,15 +45,21 @@ function FormComponent() {
           margin="normal"
           onChange={handleChange}
         />
-        <Button type="submit" variant="contained">Criar</Button>
+        {!loading && (
+          <Button type="submit" variant="contained">
+            Criar
+          </Button>
+        )}
+        {loading && <CircularProgress />} {/* Display loading tag while waiting */}
       </form>
-      <Typography variant="h4" gutterBottom>
-            Novo Post:
-            <br></br>
-            {response}
-      </Typography>
+      {response && (
+        <Card variant="outlined" style={{ marginTop: '1rem', padding: '1rem' }}>
+          <Typography variant="h6">Novo Post:</Typography>
+          <Typography>{response}</Typography>
+        </Card>
+      )}
     </div>
   );
 }
 
-export default FormComponent;
+export default PostsForm;
