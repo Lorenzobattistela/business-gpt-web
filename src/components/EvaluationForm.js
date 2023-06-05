@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography, CircularProgress, Card } from '@mui/material';
 import axios from 'axios';
 
-function FormComponent() {
+function EvaluationForm() {
   const [formData, setFormData] = useState({});
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios.post('http://127.0.0.1:5000/evaluation', formData)
-        .then((response) => {
-            setResponse(response?.data?.evaluation);
-        });
+      .then((response) => {
+        setResponse(response?.data?.evaluation);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleChange = (e) => {
@@ -21,7 +26,7 @@ function FormComponent() {
   return (
     <div>
       <Typography variant="h4" gutterBottom>
-        Form Component
+        Avaliações
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -40,15 +45,21 @@ function FormComponent() {
           margin="normal"
           onChange={handleChange}
         />
-        <Button type="submit" variant="contained">Submit</Button>
+        {!loading && (
+          <Button type="submit" variant="contained">
+            Responder Avaliação
+          </Button>
+        )}
+        {loading && <CircularProgress />} {/* Display loading tag while waiting */}
       </form>
-      <Typography variant="h4" gutterBottom>
-            Resposta de avaliação:
-            <br></br>
-            {response}
-      </Typography>
+      {response && (
+        <Card variant="outlined" style={{ marginTop: '1rem', padding: '1rem' }}>
+          <Typography variant="h6">Resposta de avaliação</Typography>
+          <Typography>{response}</Typography>
+        </Card>
+      )}
     </div>
   );
 }
 
-export default FormComponent;
+export default EvaluationForm;
